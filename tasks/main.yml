@@ -1,0 +1,28 @@
+---
+# tasks file for donfilemon.postfix
+- name: install the Postfix   
+  yum:
+    name: postfix
+    state: present
+- name: Add postfix master.cf
+  template: 
+    src: master.cf.j2 
+    dest: /etc/master.cf
+    backup: yes
+  register: conf
+- name: Add postfix main.cf
+  template: 
+    src: main.cf.j2 
+    dest: /etc/main.cf
+    backup: yes
+  register: conf
+- name: Start service postfix if not started and enable autostart 
+  service:
+    name: postfix
+    state: started
+    enabled: yes
+- name: Restart service postfix, in all cases
+  service:
+    name: postfix
+    state: restarted
+  when: conf.changed
